@@ -71,7 +71,7 @@ app.get("*", (_,res)=>{
 })
 
 // Handle all other routes for the dashboard frontend
-app.get("/dashboard/*", (_, res) => {
+app.get("/dashboard", (_, res) => {
   res.sendFile(path.resolve(_dirname, "dashboard", "dist", "index.html"));
 });
 
