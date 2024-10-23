@@ -8,10 +8,16 @@ import messageRouter from "./routers/messageRouter.js"
 import {errorMiddleware} from "./middlewares/errorMiddleware.js"
 import userRouter from "./routers/userRouter.js"
 import appointmentRouter from "./routers/appointmentRouter.js"
+import path from "path"
+
 
 // configuration of dotenv file for using important data
 const app = express();
-config({path:"./config/config.env"})
+config({path:".env"})
+
+// Combine the Frontend with backend
+// Get the file name for combining
+const _dirname = path.resolve();
 
 //Middlewares
 //1.Middleware - CORS handle the cors error and others
@@ -51,8 +57,23 @@ app.use("/api/v1/appointment",appointmentRouter)
 // Connecting DB 
 dbConnection();
 
+// Combining steps 2 :- 
+// Serve the main frontend (frontend/dist)
+app.use(express.static(path.join(_dirname,"/frontend/dist")));
 
 
+// Serve the dashboard frontend (dashboard/dist)
+app.use("/dashboard", express.static(path.join(_dirname, "dashboard", "dist")));
+
+// Handle all other routes for the main frontend
+app.get("*", (_,res)=>{
+  res.sendFile(path.resolve(_dirname,"frontend","dist","index.html"))
+})
+
+// Handle all other routes for the dashboard frontend
+app.get("/dashboard/*", (_, res) => {
+  res.sendFile(path.resolve(_dirname, "dashboard", "dist", "index.html"));
+});
 
 // 6. Middleware - Error middleware for handling the error
 app.use(errorMiddleware)
